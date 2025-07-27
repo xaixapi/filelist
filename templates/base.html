@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+    <meta name="renderer" content="webkit">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+	<link rel="shortcut icon" href="/static/favicon.svg">
+    <link rel="apple-touch-icon" href="/static/favicon.svg">
+    <link rel="stylesheet" href="{{ static_url('src/layui/css/layui.css') }}">
+    <link rel="stylesheet" href="{{ static_url('src/css/monokai_sublime.css') }}">
+    <link rel="stylesheet" href="{{ static_url('src/css/iconfont.css') }}">
+    <link rel="stylesheet" href="{{ static_url('src/css/style.css') }}">
+    <title>𝒇𝒊𝒍𝒆</title>
+  </head>
+
+  <body>
+    <header id="header">
+      <div class="layui-container">
+        <ul class="layui-nav nav-left">
+          {% if handler.app.options.auth %}
+          <li class="layui-nav-item"><a href="/disk/0"><i class="layui-icon layui-icon-release"></i>共享文件</a></li>
+          {% if current_user %}
+          <li class="layui-nav-item"><a href="/"><i class="layui-icon layui-icon-auz"></i>我的文件</a></li>
+          {% end %}
+          {% end %}
+          {% if handler.app.options.tools %}
+          <li class="layui-nav-item"><a href="/chart"><i class="icon iconfont icon-areachart"></i>Chart</span></a></li>
+          <li class="layui-nav-item"><a href="/table"><i class="icon iconfont icon-table"></i>Table</span></a></li>
+          {% end %}
+          <li class="layui-nav-item">
+            <form class="pc layui-form">
+                <input class="layui-input" placeholder="..." name="q" {% if handler.args.q %}value="{{ handler.args.q }}"{% end %}>
+            </form>
+          </li>
+        </ul>
+        {% if handler.app.options.auth %}
+        <ul class="layui-nav nav-right" lay-filter="">
+          <li class="layui-nav-item logout layui-hide">
+            <a href="javascript:;"><span class="username"></span></a>
+            <dl class="layui-nav-child">
+              <dd><a href="/set">用户中心</a></dd>
+              <dd><a href="/share">我的分享</a></dd>
+              <dd class="layui-hide user-admin"><a href="/manage">用户管理</a></dd>
+              <dd class="layui-hide user-admin"><a href="/disk">文件管理</a></dd>
+              <dd><a class="user-logout" href="/logout">退出</a></dd>
+            </dl>
+          </li>
+          <li class="layui-nav-item login layui-hide"><a href="/signin">登录</a></li>
+          <li class="layui-nav-item login layui-hide"><a href="/signup">注册</a></li>
+        </ul>
+        {% end %}
+      </div>
+    </header>
+    <div id="content">
+      {% block page-content %}
+      <div class="layui-container">{% block content %}{% end %}</div>
+      {% end %}
+    </div>
+
+<style>
+.xai-ads {
+  position: fixed;
+  top: 240px;
+  right: 20px;
+  width: 340px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 150px);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(20px);
+  z-index: 999;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.5s ease-out;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.xai-ads:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(100px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.xai-ads-link { text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1; }
+.xai-ads-link:hover { text-decoration: none; }
+.xai-ads .img-wrap { width: 100%; height: 200px; background: rgba(0, 0, 0, 0.03); overflow: hidden; }
+.xai-ads .img-main { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+.xai-ads:hover .img-main { transform: scale(1.05); }
+.xai-ads .content { padding: 24px; flex: 1; background: rgba(255, 255, 255, 0.5); }
+.xai-ads .title { font-weight: 700; font-size: 18px; margin-bottom: 12px; color: #1a202c; line-height: 1.3; }
+.xai-ads .desc { color: rgba(0, 0, 0, 0.65); font-size: 14px; line-height: 1.7; }
+.xai-ads .nav { display: flex; justify-content: center; gap: 12px; padding: 6px; background: rgba(255, 255, 255, 0.5); }
+.xai-ads .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0, 0, 0, 0.2); cursor: pointer; transition: all 0.3s ease; }
+.xai-ads .dot.active { background: #1a202c; transform: scale(1.2); }
+@media(max-width: 768px){
+  .xai-ads { top: 240px; right: 10px; width: 170px; max-width: calc(50vw - 20px); max-height: 280px; }
+  .xai-ads .img-wrap { height: 100px; }
+  .xai-ads .content { padding: 16px; }
+  .xai-ads .title { font-size: 14px; }
+  .xai-ads .desc { display: none; }
+  .xai-ads .nav { display: none; }
+}
+@media (prefers-color-scheme: dark) {
+  .xai-ads { background: rgba(26, 32, 44, 0.7); border-color: rgba(255, 255, 255, 0.1); }
+  .xai-ads .content { background: rgba(0, 0, 0, 0.3); }
+  .xai-ads .title { color: #e2e8f0; }
+  .xai-ads .desc { color: rgba(226, 232, 240, 0.7); }
+  .xai-ads .nav { background: rgba(0, 0, 0, 0.3); }
+  .xai-ads .dot { background: rgba(255, 255, 255, 0.2); }
+  .xai-ads .dot.active { background: #e2e8f0; }
+}
+</style>
+
+<div id="xai-ads" class="xai-ads" style="display:none">
+  <a id="ads-link" class="xai-ads-link" href="" target="_blank">
+    <div class="img-wrap">
+      <img id="ads-img" class="img-main" src="" alt="">
+    </div>
+    <div class="content">
+      <div id="ads-title" class="title"></div>
+      <div id="ads-desc" class="desc"></div>
+    </div>
+  </a>
+  <div id="ads-nav" class="nav"></div>
+</div>
+
+<script>
+let ads = [], curIdx = 0, timer = null;
+function showAd(idx) {
+  if (!ads.length) return;
+  const ad = ads[idx];
+  document.getElementById('ads-img').src = ad.image_url || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23e2e8f0"/%3E%3C/svg%3E';
+  document.getElementById('ads-link').href = ad.link;
+  document.getElementById('ads-title').textContent = ad.title;
+  document.getElementById('ads-desc').innerHTML = ad.content;
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+  curIdx = idx;
+}
+function startRotation() {
+  if (timer) clearInterval(timer);
+  if (ads.length > 1) timer = setInterval(() => showAd((curIdx + 1) % ads.length), 3000);
+}
+(async () => {
+  try {
+    const res = await fetch('https://api.xabcstack.com/x-ads');
+    const data = await res.json();
+    if (!data.success || !data.ads?.length) return;
+    ads = data.ads.sort((a,b) => b.priority - a.priority);
+    const nav = document.getElementById('ads-nav');
+    if (ads.length > 3) {
+      ads.forEach((_, i) => {
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        dot.onclick = (e) => { e.preventDefault(); showAd(i); startRotation(); };
+        nav.appendChild(dot);
+      });
+    } else {
+      nav.style.display = 'none';
+    }
+    showAd(0);
+    document.getElementById('xai-ads').style.display = 'flex';
+    startRotation();
+  } catch(e) {
+    console.error('Ads error:', e);
+  }
+})();
+const container = document.getElementById('xai-ads');
+container.addEventListener('mouseenter', () => clearInterval(timer));
+container.addEventListener('mouseleave', startRotation);
+</script>
+
+  </body>
+  <script>
+	  (function(){
+		  fetch('https://api.xabcstack.com/x-urls/track', {
+			  method: 'POST',
+			  headers: {'Content-Type': 'application/json'},
+			  body: JSON.stringify({url: location.href})
+		  }).catch(()=>{});
+	  })();
+  </script>
+  <script src="{{ static_url('src/layui/layui.js') }}"></script>
+  <script src="{{ static_url('src/js/jquery.min.js') }}"></script>
+  <script src="{{ static_url('src/js/highlight.min.js') }}"></script>
+  <script src="{{ static_url('src/js/clipboard.min.js') }}"></script>
+  <script src="{{ static_url('src/js/webuploader.nolog.min.js') }}"></script>
+  <script src="{{ static_url('src/js/imagesloaded.pkgd.min.js') }}"></script>
+  <script src="{{ static_url('src/js/masonry.pkgd.min.js') }}"></script>
+  <script src="{{ static_url('src/js/utils.js') }}"></script>
+  <script src="{{ static_url('src/js/page.js') }}"></script>
+
+  </script>
+  {% if handler.args.total and handler.args.total > 0 and handler.args.pages > 1 %}
+  <script>
+    layui.use(['laypage', 'util'], function () {
+      layui.util.fixbar();
+      if(layui.$('#pagination').length >= 1){
+        var params = parseUrl().params;
+        layui.laypage.render({
+          elem: 'pagination',
+          limit: {{ handler.args.size }},
+          count: {{ handler.args.total }},
+          curr: {{ handler.args.page }},
+          limits: [50, 100, 500, 1000, 5000, 10000],
+          layout: ['page', 'size', 'limit'],
+          jump: function(obj, first){
+            if(!first){
+              params.page = obj.curr;
+              params.size = obj.limit;
+              location.href = location.pathname + '?' + layui.$.param(params);
+            }
+          }
+        })
+      }
+    })
+  </script>
+  {% end %}
+  {% block js %}{% end %}
+</html>

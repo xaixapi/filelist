@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filelist
+  namespace: {{ .NS }}
+  labels:
+    app: filelist
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: filelist
+  minReadySeconds: 7
+  template:
+    metadata:
+      labels:
+        app: filelist
+    spec:
+      restartPolicy: Always
+      volumes:
+      - name: localtime
+        configMap:
+          name: localtime-cst
+      - name: data-ns
+        persistentVolumeClaim:
+          claimName: {{ .NS }}
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "filelist-redis"
+        - "filelist-mongo"
+      containers:
+      - name: filelist-redis
+        image: redis:alpine
+        imagePullPolicy: Always
+        env:
+        - name: TZ
+          value: Asia/Shanghai
+        volumeMounts:
+        - name: data-ns
+          mountPath: /data
+          subPath: filelist/redis
+      - name: filelist-mongo
+        image: mongo
+        imagePullPolicy: Always
+        env:
+        - name: TZ
+          value: Asia/Shanghai
+        volumeMounts:
+        - name: data-ns
+          mountPath: /data/db
+          subPath: filelist/mongo/db
+      - name: filelist
+        image: ywgx/filelist
+        imagePullPolicy: Always
+        env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: EMAIL_SMTP
+          value: smtp.exmail.qq.com
+        - name: EMAIL_SENDER
+          value: XABC<service@filelist.cn>
+        - name: EMAIL_PORT
+          value: "465"
+        - name: EMAIL_USER
+          value: service@filelist.cn
+        - name: EMAIL_PWD
+          value: xGrShcK2Hx4y95mF
+        - name: EMAIL_TLS
+          value: true
+        volumeMounts:
+        - name: data-ns
+          mountPath: /home/ywgx/1/filelist/files
+          subPath: filelist/files
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: filelist
+  namespace: {{ .NS }}
+spec:
+  ports:
+  - name: tcp-80
+    port: 80
+    protocol: TCP
+    targetPort: 3006
+  selector:
+    app: filelist
+  sessionAffinity: None
+  type: ClusterIP

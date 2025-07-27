@@ -1,0 +1,145 @@
+{% extends base.html %}{% block content %}
+<div class="layui-content">
+  <div class="layui-tab layui-tab-brief" lay-filter="admin">
+    <ul class="layui-tab-title">
+      <li lay-id="1">𝑲𝒊𝒏𝒅𝒍𝒆 推送邮箱</li>
+      <li lay-id="2">密码更改</li>
+      {% if handler.app.options.auth and current_user and current_user.admin %}
+      <li lay-id="3">注册设置</li>
+      <li lay-id="4">系统信息</li>
+      {% end %}
+    </ul>
+    <div class="layui-tab-content">
+      {% if current_user.admin %}
+      <div class="layui-tab-item">
+      {% else %}
+      <div class="layui-tab-item layui-show">
+      {% end %}
+        <blockquote class="layui-elem-quote">
+          <p>设置 𝑲𝒊𝒏𝒅𝒍𝒆 推送邮箱,请先将 <b>{{ handler.app.email.user }}</b> 添加到已认可的发件人电子邮箱列表,当前推送邮箱 [ {{ current_user.kindle }} ]</p>
+        </blockquote>
+        <form class="layui-form" action="/set" method="POST">
+          <div class="layui-form-item">
+            <label class="layui-form-label">Kindle 邮箱</label>
+            <div class="layui-input-inline">
+              <input name="kindle" autocomplete="off" class="layui-input" value="{{ current_user.kindle or '' }}">
+            </div>
+            <div class="layui-form-mid">
+              <button type="button" class="layui-btn layui-btn-primary layui-btn-xs layui-btn-radius btn-email">发送验证码</button>
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">验证码</label>
+            <div class="layui-input-inline">
+              <input name="code" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">公开访问</label>
+            <div class="layui-input-inline">
+              <input type="checkbox" name="public" lay-skin="switch" lay-text="开启|关闭" {% if current_user.public %}checked{% end %}>
+            </div>
+            <div class="layui-form-mid layui-word-aux">公开[我的文件],则其他人不需要验证即可直接访问</div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              {% if handler.mobile %}
+              <button class="layui-btn layui-btn-primary layui-btn-fluid" lay-submit lay-filter="default">保存</button>
+              {% else %}
+              <button style="width:190px" class="layui-btn layui-btn-primary layui-btn-fluid" lay-submit lay-filter="default">保存</button>
+              {% end %}
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="layui-tab-item">
+        <blockquote class="layui-elem-quote">
+          <p>在此处更改您的密码</p>
+        </blockquote>
+        <form class="layui-form" action="/user" method="POST">
+          <div class="layui-form-item">
+            <label class="layui-form-label">原密码</label>
+            <div class="layui-input-inline">
+              <input type="password" name="old_password" placeholder="原密码" autocomplete="off" class="layui-input" required lay-verify="required" readonly onfocus="this.removeAttribute('readonly');">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">新密码</label>
+            <div class="layui-input-inline">
+              <input type="password" name="password" placeholder="新密码" autocomplete="off" class="layui-input" required lay-verify="required" readonly onfocus="this.removeAttribute('readonly');">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">再确认</label>
+            <div class="layui-input-inline">
+              <input type="password" name="password" placeholder="再输入一次" autocomplete="off" class="layui-input" required lay-verify="required" readonly onfocus="this.removeAttribute('readonly');">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              {% if handler.mobile %}
+              <button class="layui-btn layui-btn-primary layui-btn-fluid" lay-submit lay-filter="default">保存</button>
+              {% else %}
+              <button style="width:190px" class="layui-btn layui-btn-primary layui-btn-fluid" lay-submit lay-filter="default">保存</button>
+              {% end %}
+            </div>
+          </div>
+        </form>
+      </div>
+
+      {% if current_user.admin %}
+      <div class="layui-tab-item">
+        <blockquote class="layui-elem-quote">
+          <p>可以设置一个邮箱白名单或黑名单，当设置了白名单时，只允许使用在白名单中的邮箱后缀进行注册。如果要设置黑名单，则需要清空白名单。</p>
+          <p>例如: qq.com,163.com,gmail.com (逗号分隔即可)</p>
+          {% if handler.app.email_whitelist %}
+          <p>当前注册邮箱白名单: <b>{{ handler.app.email_whitelist }}</b> </p>
+          {% end %}
+          {% if handler.app.email_blacklist %}
+          <p>当前注册邮箱黑名单: <b>{{ handler.app.email_blacklist }}</b> </p>
+          {% end %}
+        </blockquote>
+        <form class="layui-form" action="/set" method="POST">
+
+          <h4>设置注册邮箱白名单</h4>
+            <div class="layui-input-inline" style="display: block;">
+              <input name="whitelist" autocomplete="off" class="layui-input"  value="{{ handler.app.email_whitelist or '' }}">
+            </div>
+
+          <h4>设置注册邮箱黑名单</h4>
+            <div class="layui-input-inline" style="display: block;">
+              <input name="blacklist" autocomplete="off" class="layui-input" value="{{ handler.app.email_blacklist or '' }}">
+            </div>
+
+          <button style="display: block;" class="layui-btn layui-btn-primary layui-btn-fluid" lay-submit lay-filter="default">保存</button>
+        </form>
+      </div>
+
+      <div class="layui-tab-item layui-show">
+        <blockquote class="layui-elem-quote">
+          <p>{{ handler.app.boot_time }}</p>
+          <p>{{ handler.app.load_info_str }}</p>
+          <p>{{ handler.app.mem_info_str }}</p>
+          {% for i in handler.app.disk_info_set %}
+          <p>{{ i }}</p>
+          {% end %}
+          <p>Redis used memory: {{ handler.app.redis_mem }}</p>
+          <p>Mongo used memory: {{ handler.app.mongo_mem }} KB</p>
+          <p>Files: {{ handler.app.file_count }} <b>[ {{ handler.app.count_update }} ]</b></p>
+          <p>Send files: {{ handler.app.send_total }}</p>
+          <p>Share documents: {{ handler.app.share_documents }}</p>
+          {% for i in handler.app.signup_list %}
+          <p>{{ i }}</p>
+          {% end %}
+          {% for i in handler.app.upload_list %}
+          <p>{{ i[:20] }} <a href="/disk/{{ i[20:] }}">{{ i[20:] }}</a></p>
+          {% end %}
+        </blockquote>
+      </div>
+      {% end %}
+
+    </div>
+  </div>
+</div>
+{% end %}

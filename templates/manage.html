@@ -1,0 +1,43 @@
+{% extends base.html %}
+
+{% block content %}
+<table class="layui-table table-hover table-bordered table-sm" lay-skin="line" align="center">
+  <thead>
+    <tr>
+      <th>序号</th>
+      <th>名称</th>
+      <th class="pc">邮箱</th>
+      <th class="pc-large">𝑲𝒊𝒏𝒅𝒍𝒆</th>
+      <th class="pc-large">时间</th>
+      <th class="pc">角色</th>
+      <th class="pc-large">𝑰𝑷</th>
+      <th class="pc">操作</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for doc in entries %}
+    <tr data-id="{{ doc._id }}">
+      <td><a target="_blank" href="/disk/{{ doc.id }}"><em class="layui-tips" tips="管理 {{ doc.username or doc.nickName }} 的个人文件"><b>{{ doc.id }}</b></em></a></td>
+      <td><a target="_blank" href="/share?token={{ doc.token }}"><em class="layui-tips" tips="管理 {{ doc.username or doc.nickName }} 的分享文件"><b>{{ doc.username or doc.nickName }}</b></em></a></td>
+      <td class="pc">{{ doc.email }}</td>
+      <td class="pc-large">{{ doc.kindle }}</td>
+      <td class="pc-large">{{ str(doc.created_at) }}</td>
+      {% if doc.admin %}
+      <td class="pc" style="color:red">管理员</td>
+      {% else %}
+      <td class="pc">普通用户</td>
+      {% end %}
+      <td class="pc-large">{{ doc.ip }}</td>
+      <td class="pc">
+        <button action="toggle" class="layui-btn layui-btn-sm layui-btn-radius btn-manage">变换角色</button>
+        <button action="delete" class="layui-btn layui-btn-sm layui-btn-danger layui-btn-radius btn-manage">删除用户</button>
+      </td>
+    </tr>
+    {% end %}
+  </tbody>
+</table>
+
+<div id="pagination"></div>
+
+{% end %}

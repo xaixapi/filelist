@@ -1,0 +1,49 @@
+services:
+  filelist:
+    container_name: filelist
+    image: ywgx/filelist
+    pull_policy: always
+    depends_on:
+      - filelist-redis
+      - filelist-mongo
+    restart: always
+    volumes:
+      - /home/ywgx/1/filelist/files:/home/ywgx/1/filelist/files
+    ports:
+      - 3006:3006
+    environment:
+      - TZ=Asia/Shanghai
+      - FILELIST_AUTH=1
+      - EMAIL_SENDER=XABC<xabclink@gmail.com>
+      - EMAIL_SMTP=smtp.gmail.com
+      - EMAIL_PORT=465
+      - EMAIL_USER=xabclink@gmail.com
+      - EMAIL_PWD=vtksuddgfmgmwiks
+      - EMAIL_TLS=true
+    networks:
+      - filelist-network
+  filelist-redis:
+    container_name: filelist-redis
+    image: redis:alpine
+    pull_policy: always
+    restart: always
+    volumes:
+      - /home/ywgx/1/filelist/redis:/data
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      - filelist-network
+  filelist-mongo:
+    container_name: filelist-mongo
+    image: mongo
+    pull_policy: always
+    restart: always
+    volumes:
+      - /home/ywgx/1/filelist/mongo/db:/data/db
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      - filelist-network
+networks:
+  filelist-network:
+    driver: bridge
